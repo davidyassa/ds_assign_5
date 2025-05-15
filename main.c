@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define MAX 100
+#define MAX 1000
 typedef struct node
 {
-    char* data;
+    char* data; //data is string
     struct node* left, *right;
     int height;
 } node;
@@ -12,8 +12,10 @@ typedef struct node
 node* balancer(node*root);
 node* leftRotate(node*n);
 node* rightRotate(node*n);
+int max(int a, int b);
+int height(node* n);
 
-node* newNode (char* word)
+node* newNode(const char* word)
 {
     node*n = malloc(sizeof (node));
     n->left = n->right = NULL;
@@ -22,8 +24,8 @@ node* newNode (char* word)
     strcpy(n->data,word);
     return n;
 }
-
-node* search (node *root, char *word)
+//searching is now done with strcasecmp() instead of integer operations
+node* search(node *root, char *word)
 {
     if (root == NULL)
         return NULL;
@@ -34,29 +36,30 @@ node* search (node *root, char *word)
     else
         return search (root->right,word);
 }
-node* searchBefore (node *root, char *word)
+//get the last accessed node before the null if the word isn't found
+node* searchBefore(node *root, char *word)
 {
-    node *a=root,*b=root;
+    node *r=root,*a=NULL;
     if(!root) return NULL;
     else
     {
-        while(a)
+        while(r)
         {
-            int s = strcasecmp(word,a->data);
+            int s = strcasecmp(word,r->data);
             if(!s) break;
             else if(s < 0)
             {
-                b=a;
-                a=a->left;
+                a = r;
+                r=r->left;
             }
-            else
+            else //s>0
             {
-                b=a;
-                a=a->right;
+                a = r;
+                r=r->right;
             }
         }
     }
-    return b;
+    return a;
 }
 
 void inOrder(node *root)
@@ -64,39 +67,48 @@ void inOrder(node *root)
     if (root)
     {
         inOrder(root->left);
-        printf("%s\t", root->data);
+        printf("%s ", root->data);
         inOrder(root->right);
     }
 }
-node* findmin (node *root)
+node* findMin(node *root)
 {
     if (root == NULL)
         return root;
     else if (root ->left == NULL)
         return root;
     else
-        return findmin (root->left);
+        return findMin (root->left);
+}
+node* findMax(node *root)
+{
+    if (root == NULL)
+        return root;
+    else if (root ->right == NULL)
+        return root;
+    else
+        return findMax (root->right);
 }
 node* delete(node* root, const char* word) {
     if (!root)
         return NULL;
 
-    int cmp = strcasecmp(word, root->data);
-    if (cmp < 0)
+    int s = strcasecmp(word, root->data);
+    if (s < 0)
         root->left = delete(root->left, word);
-    else if (cmp > 0)
+    else if (s > 0)
         root->right = delete(root->right, word);
-    else {
-        // Node to delete found
+    else // Node to delete found
+    {        
         if (!root->left || !root->right) {
             node* temp = root->left ? root->left : root->right;
-            if (!temp) {
-                // No child
+            if (!temp) // No child
+            {
                 free(root->data);
                 free(root);
                 return NULL;
-            } else {
-                // One child
+            } else // One child
+            {
                 node* toFree = root;
                 root = temp;
                 free(toFree->data);
@@ -104,7 +116,7 @@ node* delete(node* root, const char* word) {
             }
         } else {
             // Two children
-            node* min = findmin(root->right);
+            node* min = findMin(root->right);
             free(root->data);
             root->data = malloc(strlen(min->data) + 1);
             strcpy(root->data, min->data);
@@ -153,16 +165,16 @@ node* balancer(node*root)
 {
     int balance = getBalance(root);
 
-    if (balance >= 2 && getBalance(root->left) >= 0) // LL
+    if (balance >= 2 && getBalance(root->left) >= 0) // LL violation
         return rightRotate(root);
-    if (balance >= 2 && getBalance(root->left) < 0) // LR
+    if (balance >= 2 && getBalance(root->left) < 0) // LR violation
     { 
         root->left = leftRotate(root->left);
         return rightRotate(root);
     }
-    if (balance <= -2 && getBalance(root->right) <= 0) // RR
+    if (balance <= -2 && getBalance(root->right) <= 0) // RR violation
         return leftRotate(root);
-    if (balance <= -2 && getBalance(root->right) > 0) // RL
+    if (balance <= -2 && getBalance(root->right) > 0) // RL violation
     { 
         root->right = rightRotate(root->right);
         return leftRotate(root);
@@ -236,36 +248,99 @@ node* loadTree(char* filename)
     fclose(fp);
     return root;
 }
-
+node* predecessor(node* root, node*target)
+{
+    node*r=root;
+    node*p=NULL;
+    if(!root || !target) return NULL;
+    if(target->left)
+        return findMax(target->left);
+    else
+    {
+        while(r)
+        {
+            int s = strcasecmp(target->data,r->data);
+            if(!s) break;
+            else if(s>0)
+            {
+                p=r;
+                r=r->right;
+            }
+            else
+            { 
+                r=r->left;
+            }
+        }
+    }
+    return p;
+}
+node* successor(node* root, node*target)
+{
+    node*r=root;
+    node*p=NULL;
+    if(!root || !target) return NULL;
+    if(target->right)
+        return findMin(target->right);
+    else
+    {
+        while(r)
+        {
+            int s = strcasecmp(target->data,r->data);
+            if(!s) break;
+            else if(s<0)
+            {
+                p=r;
+                r=r->left;
+            }
+            else
+            { 
+                r=r->right;
+            }
+        }
+    }
+    return p;
+}
 void checkDictionary(node*root,char* word)
 {
     if (search(root, word))
-        printf("Found!\n");
+    printf("-\"%s\"\t\tFound!\n",word);
     else
     {
-        node*n=searchBefore(root,word);
-        printf("Suggestions:\n");
-        printf("- %s\n",n->data);
-        if(n->left) printf("- %s\n",n->left->data);
-        if(n->right) printf("- %s\n",n->right->data);
+        node*n = searchBefore(root,word);
+        node*a = predecessor(root,n);
+        node*b = successor(root,n);
+        
+        printf("-\"%s\"\tNot Found!\t",word);
+        printf("Suggestions: ");
+        printf("%s, ",n->data);
+        printf("%s, ",a->data);
+        printf("%s. \n",b->data);
     }
 }
+
 void func()
 {
-    char word[MAX];
+    char string[MAX],delim[]=" \n1234567890.,!@#$^&*()-=_+";
     node* root = loadTree("Dictionary.txt");
     printf("Welcome to the Fifth Assignment\n\n");
     printf("Number of Nodes: %d\n",count(root));
     printf("Tree Height: %d\n",height(root));
 
-    printf("\nEnter a word to search: ");
-    scanf("%s", word);
-    checkDictionary(root,word);
+    printf("\nEnter a sentence to search: ");
+    fgets(string,sizeof(string),stdin);
+    printf("\n");
+    char*tok = strtok(string,delim);
+    while(tok)
+    {
+        checkDictionary(root,tok);
+        tok = strtok(NULL,delim);
+    }
     freeTree(root);
 }
 
 int main()
 {
+    system("cls");
     func();
     return 0;
 }
