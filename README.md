@@ -1,12 +1,37 @@
 # ds_assign_5
-### Implementing a spell-checking system using a self-correcting Binary Search Tree (AVL tree)  
-The program prompts the user to enter a sentence to check its spelling.  
-Each word in the entered sentence is checked to see whether it exists in the BST.  
-1. If the word exists, it will print that the word is correct.  
-2. If the word does not exist, it will print three suggestions for the correct word:  
-A. The word in the last node reached before declaring that the word does not exist.  
-B. The word in the inorder predecessor of that node in Part A.  
-C. The word in the inorder successor of that node in Part A.
+# 🔍 Spell Checker using AVL Tree in C
 
-When the program starts, it loads a text file containing all language words by default, and prints the size and height of the tree.  
-Then it asks the user to enter a sentence and checks whether each word in the sentence exists in the dictionary. If not, it prints the three suggestions as mentioned above.  
+This project is a **spell-checking system** implemented in C using an **AVL Tree** (a self-balancing Binary Search Tree). The dictionary is loaded from a file, and the program checks user-input sentences for correct spelling, offering **suggestions** when a word is not found.
+
+---
+
+## 📄 Features
+
+- 📚 Loads dictionary words from a file (`Dictionary.txt`)
+- 🌳 Constructs an AVL Tree for efficient word lookup
+- 🧠 Calculates and displays:
+  - Total number of words (nodes)
+  - Height of the tree
+- ✅ Verifies the correctness of each word in a user-entered sentence
+- 🔎 If a word is not found, suggests three alternatives:
+  - The last node visited before failure
+  - The inorder predecessor and inorder successor of that node
+
+---
+
+## ⚙️ How It Works
+
+1. **Build the Dictionary Tree**
+   - Reads each word from `Dictionary.txt`
+   - Inserts them into an AVL tree to ensure balance for fast lookup
+
+2. **Spell Check**
+   - Accepts a user-entered sentence
+   - Splits it into individual words
+   - Searches each word in the AVL tree
+
+3. **Suggestions**
+   - If not found, prints:
+     - Closest match (last visited node)
+     - Inorder predecessor (lexical previous)
+     - Inorder successor (lexical next)
