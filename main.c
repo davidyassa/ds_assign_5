@@ -305,7 +305,7 @@ node *successor(node *root, node *target)
     }
     return p;
 }
-void toLowerStr(char *str)
+void toLowerStr(char *str) //makes a word lowercase
 {
     for (int i = 0; str[i]; i++)
         str[i] = tolower(str[i]);
@@ -313,20 +313,20 @@ void toLowerStr(char *str)
 void checkDictionary(node *root, char *word)
 {
     toLowerStr(word);
-    node *lastvisisted = NULL;
-    node *found = searchBefore(root, word, &lastvisisted);
+    node *lastvisited = NULL;
+    node *found = searchBefore(root, word, &lastvisited);
 
     if (found)
         printf("-\"%s\"\t\tFound!\n", word);
     else
     {
-        node *a = predecessor(root, lastvisisted);
-        node *b = successor(root, lastvisisted);
+        node *a = predecessor(root, lastvisited);
+        node *b = successor(root, lastvisited);
 
         printf("-\"%s\"\tNot Found!\t", word);
         printf("Suggestions: ");
-        if (lastvisisted)
-            printf("%s, ", lastvisisted->data);
+        if (lastvisited)
+            printf("%s, ", lastvisited->data);
         if (a)
             printf("%s, ", a->data);
         if (b)
@@ -338,10 +338,10 @@ void func()
 {
     char string[MAX], delim[] = " \n1234567890.,!@#$^&*()-=_+";
     node *root = loadTree("Dictionary.txt");
-    printf("Welcome to the Fifth Assignment\n\n");
+    printf("Welcome to the Spell-checking System\n\n");
     printf("Number of Nodes: %d\n", count(root));
     printf("Tree Height: %d\n", height(root));
-
+    
     printf("\nEnter a sentence to search: ");
     fgets(string, sizeof(string), stdin);
     printf("\n");
