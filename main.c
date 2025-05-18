@@ -317,13 +317,13 @@ void checkDictionary(node *root, char *word)
     node *found = searchBefore(root, word, &lastvisited);
 
     if (found)
-        printf("-\"%s\"\t\tFound!\n", word);
+        printf("-  \"%s\"\t\tFound!\n", word);
     else
     {
         node *a = predecessor(root, lastvisited);
         node *b = successor(root, lastvisited);
 
-        printf("-\"%s\"\tNot Found!\t", word);
+        printf("-  \"%s\"\tNot Found!\t", word);
         printf("Suggestions: ");
         if (lastvisited)
             printf("%s, ", lastvisited->data);
